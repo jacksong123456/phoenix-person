@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 public class Address  implements Serializable {
     private String test;
+    
 	/**
 	 * 父类型
 	 */
