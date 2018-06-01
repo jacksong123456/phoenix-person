@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="person_push">
+    <select id="findByIndustry" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+        SELECT s.personId,s.personType,s.name1,s.name2,s.POSITION,s.company,s.picPath,s.gender  
+        FROM tb_person_simple s
+        WHERE s.personId IN (SELECT p.sourceId FROM tb_person_push p
+        <if test="industryId!=null">
+            WHERE p.industryId IN(${industryId})
+        </if>
+        )
+        <if test="typeId!=null ">
+            and  s.typeId=#{typeId}
+        </if>
+        <if test="regionIds!=null ">
+            and  s.regionId in  (${regionIds})
+        </if>
+        <if test="industryDirections != null">
+            and s.secondIndustryDirectionId in (${industryDirections}) 
+        </if>   
+        <if test="name!=null ">
+            and s.name1 like CONCAT(#{name},'%') or s.name2 like CONCAT(#{name},'%')
+        </if>        
+        order by id desc
+        limit #{limi1} , #{limi2}
+	</select>
+    <select id="findByIndustryCount" parameterType="Map" resultType="java.util.HashMap">
+        SELECT count(1) as cnt
+        FROM tb_person_simple s
+        WHERE s.personId IN (SELECT p.sourceId FROM tb_person_push p
+        <if test="industryId!=null">
+            WHERE p.industryId IN(${industryId})
+        </if>
+        )
+        <if test="typeId!=null ">
+            and  s.typeId=#{typeId}
+        </if>
+        <if test="regionIds!=null ">
+            and  s.regionId in  (${regionIds})
+        </if>
+        <if test="industryDirections != null">
+            and s.secondIndustryDirectionId in (${industryDirections}) 
+        </if>
+        <if test="keyowrd!=null ">
+            and CONCAT(s.name1,s.name2) like CONCAT('%',#{keyowrd},'%')
+        </if>
+    </select>
+    <select id="findPersonPType" parameterType="Map" resultType="java.util.HashMap">
+        SELECT MIN(ptype) ptype FROM tb_person_push WHERE sourceId=#{personId} AND sourceType=#{personType}
+    </select>
+</mapper>

@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="person_simple">
+
+	<sql id="tb_person_simple_columns">
+		phone,
+		careerId,
+		typeId,
+		regionId,
+		picPath,
+		position,
+		company, 
+		createtime,
+		pinyin,
+		name2,
+		name1,
+		personType,
+		personId,
+		ID,
+		creator,
+		country,
+		city,
+		county,
+		typeName,
+		gender
+	</sql>
+	<sql id="tb_person_simple_properties">
+		#{phone},
+		#{careerId},
+		#{typeId},
+		#{regionId},
+		#{picpath},
+		#{position},
+		#{company},
+		#{createtime},
+		#{pinyin},
+		#{name2},
+		#{name1},
+		#{persontype},
+		#{personid},
+		#{id},
+		#{creator},
+		#{country},
+		#{city},
+		#{county},
+		#{typeName},
+		#{gender}
+	</sql>
+	<sql id="category_simple">
+	SELECT
+				personId,
+				category_id,
+				ctype,
+				tb_person_simple.ID,
+				personType,
+				name1,
+				name2,
+				pinyin,
+				createtime,
+				company,
+				position,
+				picPath,
+				regionId,
+				typeId,
+				careerId,
+				phone  ,
+				country,
+				city,
+				county,
+				typeName,
+				gender,
+				creator,
+				tb_r_person_category.ctime as  ctime
+				FROM
+				tb_person_simple LEFT   join tb_r_person_category
+				on tb_r_person_category.person_id = tb_person_simple.personId and
+ tb_person_simple.personType=tb_r_person_category.person_type
+	</sql>
+	<select id="findByCategory" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		<include refid="person_simple.category_simple" />
+		 where category_id=#{categoryId} and tb_r_person_category.user_id=#{userId}
+		<if test="udate!=null ">
+			and (tb_r_person_category.ctime>#{udate} or tb_person_simple.createtime>#{udate})
+		</if>
+	</select>
+	<select id="findByUIdAndN1AndN2" parameterType="Long" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		<include refid="person_simple.category_simple" />
+		where user_id=#{userId} and COALESCE(name1,'')=#{name1} and COALESCE(name2,'')=#{name2}
+	</select>
+
+
+	<!-- <select id="findByTid" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		<include refid="person_simple.category_simple" />
+		LEFT  JOIN tb_r_person_tag on tb_r_person_tag.person_id=personId
+		where tag_id=#{tagId} and tb_r_person_category.user_id=#{userId}
+		<if test="udate!=null ">
+			and (tb_r_person_category.ctime>#{udate} or tb_person_simple.createtime>#{udate})
+		</if>
+	</select> -->
+	<select id="findByTid" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+	    SELECT
+			    personId,
+				tb_person_simple.ID,
+				personType,
+				name1,
+				name2,
+				pinyin,
+				createtime,
+				company,
+				position,
+				picPath,
+				regionId,
+				typeId,
+				careerId,
+				phone  ,
+				country,
+				city,
+				county,
+				typeName,
+				gender,
+				creator,
+				tb_r_person_tag.ctime as  ctime
+				FROM
+				tb_person_simple inner JOIN tb_r_person_tag on tb_r_person_tag.person_id=personId
+		where tag_id=#{tagId} and tb_person_simple.creator=#{userId}
+		<if test="udate!=null ">
+			and (tb_r_person_tag.ctime>#{udate} or tb_person_simple.createtime>#{udate})
+		</if>
+	</select>
+
+	<select id="findByCategoryIdAndTid" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		<include refid="person_simple.category_simple" />
+			LEFT  JOIN tb_r_person_tag on tb_r_person_tag.person_id=personId
+			where category_id=#{categoryId}
+			and tb_r_person_category.user_id=#{userId}
+		and  tag_id=#{tagId}
+		<if test="udate!=null ">
+			and (tb_r_person_category.ctime>#{udate} or tb_person_simple.createtime>#{udate})
+		</if>
+	</select>
+	<select id="findByUserId" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		<include refid="person_simple.category_simple" />
+		where tb_r_person_category.user_id=#{userId}
+		<if test="udate!=null ">
+			and (tb_r_person_category.ctime>#{udate} or tb_person_simple.createtime>#{udate})
+		</if>
+	</select>
+	<insert id="insert" parameterType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO tb_person_simple (phone,   careerId,   typeId,   regionId,
+		   picPath,   position,   company,	createtime,   pinyin,   name2,
+		   name1,   personType,   personId,creator,country,	city,county,typeName,gender,firstIndustryDirectionId,secondIndustryDirectionId
+		) VALUES (
+		#{phone},
+		#{careerId},
+		#{typeId},
+		#{regionId},
+		#{picpath},
+		#{position},
+		#{company},
+		#{createtime},
+		#{pinyin},
+		#{name2},
+		#{name1},
+		#{persontype},
+		#{personid},
+		#{creator},
+		#{country},
+		#{city},
+		#{county},
+		#{typeName},
+		#{gender},
+		#{firstIndustryDirectionId},
+		#{secondIndustryDirectionId}
+		)
+	</insert>
+	<insert id="insertBatch" parameterType="java.util.Map">
+		insert into tb_person_simple (phone,   careerId,   typeId,   regionId, 
+		  picPath,   position,   company,createtime,   pinyin,   name2, 
+		    name1,   personType,   personId,creator,country,city,county,
+		    typeName,gender) VALUES
+		<foreach collection="list" item="item" separator="," >
+			( #{item.phone}, #{item.careerId},#{item.typeId},#{item.regionId},
+			#{item.picpath}, #{item.position}, #{item.company}, #{item.createtime},
+			 #{item.pinyin}, #{item.name2}, #{item.name1}, #{item.persontype}, 
+			 #{item.personid}, #{item.creator} ,#{item.country},#{item.city}
+			 ,#{item.county},#{item.typeName},#{item.gender}
+			 )
+		</foreach>
+	</insert>
+	<delete id="deleteByPerIdAndPerType" parameterType="Map">
+		DELETE FROM tb_person_simple WHERE personId = #{personId} and personType=#{personType}
+	</delete>
+	<update id="updateByPerIdAndperType" parameterType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		UPDATE tb_person_simple SET
+		phone = #{phone},
+		careerId = #{careerId},
+		typeId = #{typeId},
+		regionId = #{regionId},
+		picPath = #{picpath},
+		createtime=NOW(),
+		<if test="position!=null and position!=''">
+			position = #{position},
+		</if>
+		company = #{company},
+		name1 = #{name1} ,
+		name2 = #{name2},
+		pinyin = #{pinyin},
+		country =#{country},
+		city =  #{city},
+		county= #{county},
+		typeName =  #{typeName},
+		gender = #{gender}
+		WHERE
+		personId = #{personid}
+	</update>
+
+	<select id="findByRecAndSendAndPush" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		select * from  tb_person_simple   LEFT   join tb_person_permission on tb_person_permission.personId = tb_person_simple.personId and
+		tb_person_simple.personType=tb_person_permission.personType where receiveId = #{receiveId} and sendId != #{sendId} and isPush=#{isPush}
+		<if test="typeId!=null ">
+			and  typeId=#{typeId}
+		</if>
+		<if test="regionIds!=null ">
+			and  regionId in  (${regionIds})
+		</if>
+		<if test="careerIds!=null ">
+			and  careerId in  (${careerIds})
+		</if>
+		  order by tb_person_permission.createtime desc  limit #{limi1} , #{limi2}
+	</select>
+
+
+
+	<select id="findCountByRecAndSendAndPush" parameterType="Map" resultType="java.util.HashMap">
+		select count(*) as count from  tb_person_simple   LEFT   join tb_person_permission on tb_person_permission.personId = tb_person_simple.personId and
+		tb_person_simple.personType=tb_person_permission.personType where receiveId = #{receiveId} and sendId != #{sendId} and isPush=#{isPush}
+		<if test="typeId!=null ">
+			and  typeId=#{typeId}
+		</if>
+		<if test="regionIds!=null ">
+			and  regionId in  (${regionIds})
+		</if>
+		<if test="careerIds!=null ">
+			and  careerId in  (${careerIds})
+		</if>
+	</select>
+
+	<select id="test" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+	select * from  tb_person_simple where  1=1
+		<if test="name1!=null and name1!='' ">
+	 		and name1=#{name1}
+	 	</if>
+	 	<if test="name1=null or name1=''">
+	 		and  name1="" or name1 is null
+	 	</if>
+	 	<if test="name2!=null and name2!=''">
+	 		and  name2=#{name2}
+	 	</if>
+	 	<if test="name2=null  or name2=''">
+	 		and name2="" or name2 is null
+	 	</if>
+
+	</select>
+
+	<select id="findByPeIdsAndPeTypeAndCtime" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		select * from  tb_person_simple where  personId in  (${personIds}) and personType=#{personType}
+		<if test="updateDate=null">
+			and createtime>#{updateDate}
+		</if>
+	</select>
+
+
+	<select id="findByPeIdsAndPetypeAndCaIdAndtagId" parameterType="Map" resultType="com.ginkgocap.ywxt.person.model.PersonSimple">
+		<include refid="person_simple.category_simple" />
+		      LEFT  JOIN tb_r_person_tag on
+		tb_r_person_tag.person_id=personId and
+		tb_r_person_tag.person_type=personType
+		where
+		personId  in  (${personIds}) and
+		personType = #{personType}
+		<if test="categoryId!=null ">
+			and category_id=#{categoryId}
+		</if>
+		<if test="tag_id!=null ">
+			 tag_id=#{tagId}
+		</if>
+	</select>
+
+	<!-- 只用于数据移植 -->
+	<update id="updateUserPeopleId" parameterType="Map">
+		update phoenix_user.tb_user set peopleId=#{peopleId} where id=#{id}
+	</update>
+
+
+	<select id="selectPerson" parameterType="Map" resultType="java.util.HashMap">
+        select distinct p.personId as personId from tb_person_simple p right join 
+        (select distinct r.person_id as person_id FROM tb_r_person_category r where
+         r.person_type = #{personType} and r.user_id= #{userId}
+          <if test="ctype != 0">
+          and r.ctype = #{ctype}
+          </if>
+          )
+ 		 a on a.person_id = p.personId where p.pinyin != ""
+ 		 
+ 		 <if test="keyword != null">
+ 		   AND CONCAT(p.name1,p.name2) like CONCAT("%",#{keyword},"%")
+ 		 </if>
+ 		 
+ 		 <if test="order == -1">
+ 		     
+			<if test="poepleRecordWord != null">
+ 		     AND LEFT(p.pinyin,1)  &lt;= #{poepleRecordWord} 
+ 		     and (case when LEFT(p.pinyin,1) = #{poepleRecordWord}  then (case when p.personId &lt; #{poepleRecordId} then true else false end) else true end)
+			</if>
+			
+			<if test="poepleRecordWord == null">
+			   and p.personId &lt; #{poepleRecordId}
+			</if>
+			
+ 		 </if>
+ 		 
+ 		 <if test="order == 1">
+ 		     
+			<if test="poepleRecordWord != null">
+ 		     AND LEFT(p.pinyin,1) &gt;= #{poepleRecordWord} 
+ 		     and (case when LEFT(p.pinyin,1) = #{poepleRecordWord}   then (case when p.personId &gt; #{poepleRecordId} then true else false end) else true end)
+ 		    </if>
+ 		    
+			<if test="poepleRecordWord == null">
+				and p.personId &gt; #{poepleRecordId}				    
+			</if>
+			
+ 		 </if>
+ 		 
+ 		 <if test="order gt 0 || order == 0">
+ 		     
+ 			 <if test="orderRule != 1">
+ 			 	    
+ 		     	ORDER BY LEFT(p.pinyin,1) ASC,p.personId ASC 
+ 		 
+ 			 </if>
+ 			 
+ 			 <if test="orderRule == 1">
+ 			     
+ 			     ORDER BY p.createtime DESC 
+ 			     
+ 			 </if>
+ 		 </if>
+ 		 <if test="order lt 0">
+	 		 ORDER BY LEFT(p.pinyin,1) DESC,p.personId DESC
+ 		 </if>
+ 		 
+ 		  LIMIT 
+ 		  
+ 		  <if test="page != null">
+			 #{page},
+ 		  </if>
+ 		  
+ 		  #{size}
+    </select>
+    
+	<select id="selectPersonCount" parameterType="Map" resultType="java.util.HashMap">
+        select count(distinct p.personId) as count from tb_person_simple p right join 
+        (select distinct r.person_id as person_id FROM tb_r_person_category r where
+         r.person_type = #{personType} and r.user_id= #{userId}
+          <if test="ctype !=0">
+          and r.ctype = #{ctype}
+          </if>
+          )
+ 		 a on a.person_id = p.personId where p.pinyin != ""
+
+ 		 <if test="keyword != null">
+ 		  AND p.pinyin like CONCAT('%',#{keyword},'%') 
+ 		 </if>
+ 		 
+    </select>
+
+	<select id="selectPersonExist" parameterType="Map" resultType="java.lang.Integer">
+	    
+       select count(1) from tb_person_simple where personId=#{personId}
+ 		 
+    </select>
+
+</mapper>  

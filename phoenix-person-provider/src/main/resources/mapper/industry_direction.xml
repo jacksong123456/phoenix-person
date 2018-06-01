@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tb_industry_direction">
+
+    <resultMap id="IndustryDirectionResult" type="com.ginkgocap.ywxt.person.model.IndustryDirection">
+        <result property="id" column="id"/>
+        <result property="pid" column="pid"/>
+        <result property="flag" column="flag"/>
+        <result property="name" column="name"/>
+        <result property="sortId" column="sortId"/>
+    </resultMap>
+    
+    <select id="selectIndustryDirectionByPage" parameterType="Map" resultMap="IndustryDirectionResult">
+        
+        select t.id,t.pid,t.flag,t.name,t.sortid from tb_industry_direction t where t.pid=#{pid} 
+        
+        <if test="size > 0">
+        limit #{index},#{size};
+        </if>
+        
+    </select>
+    
+    <select id="selectIndustryDirectionByKeyword" parameterType="Map" resultMap="IndustryDirectionResult">
+        
+        select t.id,t.pid,t.flag,t.name,t.sortid from tb_industry_direction t where t.name like CONCAT("%",#{keyword},"%")
+        
+        <if test="size > 0">
+        limit #{size};
+        </if>
+        
+    </select>
+    
+    <select id="selectIndustryDirectionCount" parameterType="Map" resultType="java.lang.Long">
+        
+        select count(1) from tb_industry_direction t where t.pid=#{pid}
+        
+    </select>
+
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>  
+    <settings>
+        <setting name="cacheEnabled" value="true" />  
+        <setting name="lazyLoadingEnabled" value="true" />  
+        <setting name="aggressiveLazyLoading" value="false" />  
+        <setting name="multipleResultSetsEnabled" value="true" />   
+        <setting name="useColumnLabel" value="true" />   
+        <setting name="autoMappingBehavior" value="FULL" />  
+    </settings>  
+     <typeAliases>
+         <typeAlias alias="userTag" type="com.ginkgocap.ywxt.person.model.PersonTag"/>
+    </typeAliases>  
+    <mappers>
+        <mapper resource="mapper/person_tags.xml" />
+        <mapper resource="mapper/code_sort.xml" />
+        <mapper resource="mapper/person_tag.xml" />
+        <mapper resource="mapper/person_simple.xml" />
+        <mapper resource="mapper/person_permission.xml" />
+        <mapper resource="mapper/person_push.xml" />
+        <mapper resource="mapper/person_meet.xml" />
+        <mapper resource="mapper/person_category.xml" />
+        <mapper resource="mapper/person_category_relation.xml" />
+        <mapper resource="mapper/person_count.xml" />
+        <mapper resource="mapper/industry_direction.xml" />
+        <mapper resource="mapper/people_remark.xml" />
+    </mappers>
+</configuration>

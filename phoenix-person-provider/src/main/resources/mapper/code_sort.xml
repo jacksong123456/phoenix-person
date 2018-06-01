@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tb_code_sort">
+
+    <resultMap id="CodeSortResult" type="com.ginkgocap.ywxt.person.model.CodeSort">
+        <result property="id" column="id"/>
+        <result property="pid" column="pid"/>
+        <result property="name" column="name"/>
+        <result property="sortId" column="sort_id"/>
+        <result property="codeType" column="code_type"/>
+        <result property="orderNo" column="order_no"/>
+    </resultMap>
+
+    <select id="selectCodeSort" parameterType="String" resultMap="CodeSortResult">
+        select tcs.id,tcs.pid,tcs.sort_id,tcs.name,tcs.order_no from tb_code_sort tcs where tcs.code_type = #{value} order by tcs.order_no;
+    </select>
+    <select id="selectBySortId" parameterType="String" resultMap="CodeSortResult">
+         select tcs.id,tcs.pid,tcs.sort_id,tcs.name,tcs.order_no from tb_code_sort tcs where tcs.sort_id like concat(#{sortId},'_%');
+    </select>
+    <select id="get" parameterType="Long" resultMap="CodeSortResult">
+        select tcs.id,tcs.pid,tcs.sort_id,tcs.name,tcs.order_no from tb_code_sort tcs where id=#{id};
+    </select>
+    <select id="selectCodeSortName" parameterType="Map" resultMap="CodeSortResult">
+        select tcs.id,tcs.pid,tcs.sort_id,tcs.name,tcs.order_no from tb_code_sort tcs where tcs.code_type = #{type} and tcs.name like concat('%',#{keyowrd},'%') limit 10
+    </select>
+
+</mapper>

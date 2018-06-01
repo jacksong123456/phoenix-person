@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tb_people_group">
+		<select id="findGroups" parameterType="java.util.Map" resultType="java.util.HashMap">
+			select tpg.id,tpg.name,tpg.ctime,tpg.creatorid from tb_people_group tpg where tpg.creatorid=#{creatorid};
+		</select>
+</mapper>  

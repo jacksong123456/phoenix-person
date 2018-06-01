@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tb_person_tags">
+    <resultMap type="com.ginkgocap.ywxt.person.model.PersonTag" id="userTagMap">
+        <result column="tagId" property="tagId" jdbcType="BIGINT"/>
+        <result column="userId" property="userId" jdbcType="BIGINT"/>
+        <result column="tagname" property="tagName" jdbcType="VARCHAR"/>
+        <result column="num" property="num" jdbcType="BIGINT"/>
+    </resultMap>
+    <resultMap type="java.util.HashMap" id="userTagHashMap">
+        <result column="tagId" property="tagId" jdbcType="BIGINT"/>
+        <result column="userId" property="userId" jdbcType="BIGINT"/>
+        <result column="tagname" property="tagName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="tagColumns">
+        tagId,userId,tagname</sql>
+
+    <select id="selectByPrimaryKey" resultMap="userTagMap"
+            parameterType="Long">
+        select <include refid="tagColumns"/> from tb_person_tags
+        where tagId= #{value}
+    </select>
+
+
+    <!--  -->
+    <insert id="insertUserTag" parameterType="com.ginkgocap.ywxt.person.model.PersonTag">
+        insert into tb_person_tags (
+        userId,tagname
+        ) values (
+        #{userId},
+        #{tagName}
+        )
+        <selectKey resultType="Long" keyProperty="tagId" >
+            SELECT LAST_INSERT_ID() AS VALUE
+        </selectKey>
+    </insert>
+
+    <!--  -->
+    <update id="updateUserTag" parameterType="com.ginkgocap.ywxt.person.model.PersonTag">
+        update tb_person_tags set
+        tagname = #{tagName}
+        where
+        tagId = #{tagId}
+    </update>
+    <delete id="deleteUserTag" parameterType="Long">
+        delete from tb_person_tags
+        where
+        tagId = #{value}
+    </delete>
+    <delete id="deleteByTagNameAndUserId" parameterType="java.util.Map">
+        delete from tb_person_tags
+        where
+        userId = #{userId}
+        and tagname = #{tagName}
+    </delete>
+    <select id="selectByTagNameAndUserId" resultMap="userTagMap" parameterType="java.util.Map">
+        select <include refid="tagColumns"/> from tb_person_tags
+        where tagname = #{tagName}
+        and userId = #{userId}
+        order by tagId desc
+    </select>
+    <select id="selectTagNameInUserIdAndSys" resultMap="userTagMap" parameterType="java.util.Map">
+        select <include refid="tagColumns"/> from tb_person_tags
+        where tagname = #{tagName}
+        and (userId = #{userId}
+        or userId = 0)
+        order by tagId desc
+    </select>
+    <select id="selectByUserIdAndSys" resultMap="userTagMap" parameterType="java.util.Map">
+        select <include refid="tagColumns"/> from tb_person_tags
+        where  userId = #{userId}
+        or userId = 0
+        order by userId desc ,tagId desc
+        <if test="startRow!=null">
+            LIMIT #{startRow},#{pageSize}
+        </if>
+    </select>
+    <select id="selectByUserId" resultMap="userTagMap" parameterType="java.util.Map">
+        select <include refid="tagColumns"/> from tb_person_tags
+        where  userId = #{userId}
+        order by tagId desc
+        <if test="startRow!=null">
+            LIMIT #{startRow},#{pageSize}
+        </if>
+    </select>
+    <select id="findByMap" parameterType="map" resultMap="userTagHashMap">
+        select <include refid="tagColumns"/> from tb_person_tags where 1=1
+        <if test="tagId!=null">
+            and tagId=#{tagId}
+        </if>
+        <if test="tagName!=null">
+            and tagname=#{tagName}
+        </if>
+        order by tagId desc
+    </select>
+    <!-- 后台用户和系统标签的行数 -->
+    <select id="countByUserIdAndSys" resultType="Long"
+            parameterType="long">
+        select count(a.tagId) from tb_person_tags a where a.userId=0
+        or  a.userId =#{value}
+    </select>
+    <!-- 后台用户标签的行数 -->
+    <select id="countByUserId" resultType="Long"
+            parameterType="long">
+        select count(a.tagId) from tb_person_tags a where   a.userId =#{value}
+    </select>
+
+    <select id="searchPrefixPageByUserIdAndSys" resultMap="userTagMap" parameterType="java.util.Map">
+        select <include refid="tagColumns"/> from tb_person_tags
+        where (userId = #{userId}
+        or userId = 0)
+        <foreach collection="keywordArray" index="index" item="tag" separator=" or " >
+            tagname like CONCAT( #{tag}, '%')
+        </foreach>
+        order by  userId desc,tagId desc
+        <if test="startRow!=null">
+            LIMIT #{startRow},#{pageSize}
+        </if>
+    </select>
+    <select id="searchContainPageByUserIdAndSys" resultMap="userTagMap" parameterType="java.util.Map">
+        select <include refid="tagColumns"/> from tb_person_tags
+        where (userId = #{userId}
+        or userId = 0)
+        <foreach collection="keywordArray" index="index" item="tag" separator=" or " >
+            and tagname like CONCAT( #{tag}, '%')
+        </foreach>
+        order by  userId desc,tagId desc
+        <if test="startRow!=null">
+            LIMIT #{startRow},#{pageSize}
+        </if>
+    </select>
+    <!-- 后台系统标签的行数 -->
+    <select id="countBySys" resultType="Long"
+            parameterType="long">
+        select count(a.tagId) from tb_person_tags a where   a.userId =0
+    </select>
+    <!-- 后台系统标签 -->
+    <select id="selectPageBySys" resultMap="userTagMap" parameterType="java.util.Map">
+        select <include refid="tagColumns"/> from tb_person_tags
+        where  userId = 0
+        order by tagId desc
+        <if test="startRow!=null">
+            LIMIT #{startRow},#{pageSize}
+        </if>
+    </select>
+
+
+
+    <!-- 后台系统标签 -->
+    <select id="selectPageByUserId" resultMap="userTagMap" parameterType="java.util.Map">
+      SELECT
+	  *
+      FROM
+        tb_person_tags
+      WHERE
+        <if test="userId!=0">
+        userId = #{userId}
+        </if>
+      LIMIT #{startRow},#{pageSize}
+    </select>
+    <!-- 后台系统标签 -->
+    <select id="selectCountPageByUserId" resultType="Long" parameterType="java.util.Map">
+        SELECT
+        count(*) as count
+        FROM
+        tb_person_tags
+        WHERE
+        <if test="userId!=0">
+            userId = #{userId}
+        </if>
+    </select>
+    <!-- 根据ids查询数据-->
+    <select id="selectByIds" resultMap="userTagMap" parameterType="java.util.Map">
+        SELECT
+          *
+        FROM
+        tb_person_tags
+        WHERE
+          tagId in(${ids})
+    </select>
+
+
+    <!-- 根据ids查询标签数量-->
+    <select id="selectCountByIds" resultMap="userTagMap" parameterType="java.util.Map">
+      SELECT count(tag_id) as num  , tag_id as tagId from tb_r_person_tag where tag_id  in (${ids})  GROUP BY tag_id
+    </select>
+
+
+</mapper>

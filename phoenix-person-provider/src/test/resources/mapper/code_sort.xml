@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tb_code_sort">
+
+    <resultMap id="CodeSortResult" type="com.ginkgocap.ywxt.person.model.CodeSort">
+        <result property="id" column="id"/>
+        <result property="pid" column="pid"/>
+        <result property="name" column="name"/>
+        <result property="sortId" column="sort_id"/>
+        <result property="codeType" column="code_type"/>
+        <result property="orderNo" column="order_no"/>
+    </resultMap>
+
+    <select id="selectCodeSort" parameterType="String" resultMap="CodeSortResult">
+        select * from tb_code_sort where code_type = #{value} order by order_no asc
+    </select>
+    <select id="selectBySortId" parameterType="String" resultMap="CodeSortResult">
+         SELECT * FROM `tb_code_sort` WHERE sort_id like CONCAT(#{sortId},'_%');
+    </select>
+    <select id="get" parameterType="Long" resultMap="CodeSortResult">
+        SELECT * FROM `tb_code_sort` WHERE id=#{id};
+    </select>
+
+</mapper>

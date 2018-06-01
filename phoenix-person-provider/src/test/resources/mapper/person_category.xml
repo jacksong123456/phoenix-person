@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tb_person_category">
+
+    <resultMap id="categoryResult" type="com.ginkgocap.ywxt.person.model.PersonCategory">
+        <result property="id" column="id" />
+        <result property="pid" column="pid" />
+        <result property="name" column="name" />
+        <result property="sortId" column="sort_id" />
+        <result property="userId" column="user_id" />
+        <result property="ctime" column="ctime" />
+    </resultMap>
+
+    <insert id="insertPersonCategory" parameterType="com.ginkgocap.ywxt.person.model.PersonCategory">
+        insert into tb_person_category
+        ( name, sort_id, user_id ,pid)
+        VALUES
+        ( #{name}, #{sortId}, #{userId} ,#{pid} )
+    </insert>
+
+    <delete id="deletePersonCategory" parameterType="String">
+        DELETE from tb_person_category where FIND_IN_SET(id, #{value})
+    </delete>
+
+    <update id="updatePersonCategory" parameterType="com.ginkgocap.ywxt.person.model.PersonCategory">
+        update tb_person_category set name = #{name} where id = #{id}
+    </update>
+
+    <select id="findCategory" parameterType="com.ginkgocap.ywxt.person.model.PersonCategory" resultMap="categoryResult">
+        select MAX(sort_id) as sort_id from tb_person_category where 1=1
+        <if test="pid!=null"> and pid = #{pid}</if>
+        <if test="userId!=null"> and user_id = #{userId}</if>
+    </select>
+
+    <select id="selectParentCategory" parameterType="Long" resultType="Long">
+        select pid from tb_person_category where id=#{value}
+    </select>
+	<select id="findLastId" resultType="Long">
+		SELECT LAST_INSERT_ID()
+	</select>
+    <select id="findCategoryById" parameterType="Long" resultMap="categoryResult">
+        select * from tb_person_category where id = #{value}
+    </select>
+	
+    <select id="findCategoryIds" parameterType="com.ginkgocap.ywxt.person.model.PersonCategory" resultType="String">
+        select GROUP_CONCAT(id) from tb_person_category where user_id = #{userId} and sort_id like concat(#{sortId}, '%') GROUP BY user_id
+    </select>
+
+    <select id="selectCategoryBySortId" parameterType="String" resultMap="categoryResult">
+        select * from tb_person_category where sort_id like concat(#{sortId},'%') order by id
+    </select>
+
+    <select id="selectCategoryByPid" parameterType="Long" resultMap="categoryResult">
+        select * from tb_person_category where pid = #{Pid}
+    </select>
+
+    <select id="findCategoryByEntity" parameterType="Map" resultMap="categoryResult">
+        select * from tb_person_category where 1=1
+        <if test="id!=null"> and id = #{id}</if>
+        <if test="pid!=null"> and pid = #{pid}</if>
+        <if test="userId!=null"> and user_id = #{userId}</if>
+		<if test="keyword!=null"> and NAME like CONCAT('%',#{keyword},'%') </if>      
+    </select>
+
+    <select id="selectPersonCategories" parameterType="Map" resultType="java.util.HashMap">
+        select id,name from tb_person_category where id in
+        (select category_id from tb_r_person_category where user_id = #{userId} and person_id = #{personId} and person_type = #{personType})
+    </select>
+
+    <select id="selectCategories" parameterType="Map" resultType="java.util.HashMap">
+        select id,name from tb_person_category where id in (${ids})
+    </select>
+    
+    <select id="findCategoryByEntityForPage" parameterType="Map" resultMap="categoryResult">
+        select * from tb_person_category where 1=1
+        <if test="keyword != null">
+            and name like CONCAT('%',#{keyword},'%') 
+        </if>
+        <if test="id!=null"> and id = #{id}</if>
+        <if test="pid!=null"> and pid = #{pid}</if>
+        <if test="userId!=null"> and user_id = #{userId}</if>
+        <if test="limitStart >= 0 and limitEnd>= 0" >
+        limit #{limitStart}, #{limitEnd}
+      </if>
+    </select>
+    
+    <select id="countCategoryByEntityForPage" parameterType="Map" resultType="Long">
+        select count(*) from tb_person_category where 1=1 
+     	<if test="keyword != null">
+            and name like CONCAT('%',#{keyword},'%') 
+        </if>
+        <if test="id!=null"> and id = #{id}</if>
+        <if test="pid!=null"> and pid = #{pid}</if>
+        <if test="userId!=null"> and user_id = #{userId}</if>
+    </select>
+
+	<select id="countCategoryByCategoryName" parameterType="Map" resultType="Long">
+		select count(*) from tb_person_category where user_id = #{userId}
+		<if test="keyword != null">
+			and NAME = #{keyword}
+		</if>
+		<if test="pid!=null"> and pid = #{pid}</if>
+	</select>
+    
+</mapper>

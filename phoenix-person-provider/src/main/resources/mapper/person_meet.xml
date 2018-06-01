@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ginkgocap.ywxt.person.model.PersonMeet">
+
+    <resultMap id="personMeet" type="com.ginkgocap.ywxt.person.model.PersonMeet">
+        <id property="meetId" column="meet_id"/>
+        <result property="locX" column="loc_x"/>
+        <result property="locY" column="loc_y"/>
+        <result property="meetTime" column="meet_time"/>
+        <result property="repeatType" column="repeat_type"/>
+        <result property="remindType" column="remind_type"/>
+        <result property="remindTimes" column="remind_times"/>
+        <result property="taskIdA" column="task_id_a"/>
+        <result property="taskIdV" column="task_id_v"/>
+        <result property="taskIdO" column="task_id_o"/>
+        <result property="taskId" column="task_id"/>
+        <result property="personId" column="person_id"/>
+        <result property="personType" column="person_type"/>
+    </resultMap>
+
+    <select id="findByPersonid" parameterType="Long" resultMap="personMeet">
+		select * from tb_person_meet  where person_id = #{personId} order by meet_time desc
+	</select>
+
+    <select id="findByCidAndMid" parameterType="java.util.Map" resultMap="personMeet">
+		select * from tb_person_meet  where cid = #{cid} and meet_id=#{meetId} limit 1
+	</select>
+
+    <delete id="deleteByCidAndMeetId" parameterType="java.util.Map">
+		DELETE FROM tb_person_meet   where cid = #{cid} and meet_id=#{meetId}
+	</delete>
+
+    <delete id="deleteByPersonId" parameterType="Long">
+		DELETE FROM tb_person_meet WHERE  where person_id = #{person_id}
+	</delete>
+
+    <insert id="insert" parameterType="com.ginkgocap.ywxt.person.model.PersonMeet">
+        INSERT INTO `tb_person_meet` ( `content`, `color`, `country`, `province`, `city`, `town`, `location`, `loc_x`,
+        `loc_y`, `meet_time`, `repeat_type`, `remind_type`, `remind_times`, `note`, `task_id_a`, `task_id_v`,
+        `task_id_o`, `task_id`, `cid`, `ctime`, `person_id`, `person_type`)
+        VALUES ( #{content}, #{color}, #{country}, #{province}, #{city}, #{town},#{location}, #{locX}, #{locY},
+        #{meetTime}, #{repeatType}, #{remindType}, #{remindTimes}, #{note}, #{taskIdA}, #{taskIdV}, #{taskIdO},
+        #{taskId}, #{cid}, #{ctime}, #{personId}, #{personType});
+        <selectKey resultType="Long" order="AFTER"
+                   keyProperty="meetId">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <update id="updateByMeetIdAndCid" parameterType="com.ginkgocap.ywxt.person.model.PersonMeet">
+		UPDATE `tb_person_meet` SET `meet_id`=#{meetId}, `content`=#{content}, `color`=#{color}, `country`=#{country}, `province`=#{province}, `city`=#{city}, `town`=#{town}, `location`=#{location}, `loc_x`=#{locX}, `loc_y`=#{locY}, `meet_time`=#{meetTime}, `repeat_type`=#{repeatType}, `remind_type`=#{remindType}, `remind_times`=#{remindTimes}, `note`=#{note}, `task_id_a`=#{taskIdA}, `task_id_v`=#{taskIdV}, `task_id_o`=#{taskIdO}, `task_id`=#{taskId}, `cid`=#{cid}, `ctime`=#{ctime}, `person_id`=#{personId}, `person_type`=#{personType} WHERE (`meet_id`=#{meetId} and cid=#{cid});
+	</update>
+
+    <delete id="deleteByPerIdAndperType" parameterType="Map">
+		DELETE from tb_person_meet where  person_id=#{personId} and person_type=#{personType}
+	</delete>
+
+</mapper>

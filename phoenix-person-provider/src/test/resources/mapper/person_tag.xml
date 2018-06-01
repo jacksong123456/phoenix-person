@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tb_r_person_tag">
+	<resultMap id="personTagRelation" type="com.ginkgocap.ywxt.person.model.PersonTagRelation">
+		<id property="personId" column="person_id"/>
+		<result property="personType" column="person_type"/>
+		<result property="tagId" column="tag_id"/>
+	</resultMap>
+	<insert id="insert" parameterType="com.ginkgocap.ywxt.person.model.PersonTagRelation">
+		INSERT INTO tb_r_person_tag
+		(person_id,
+		person_type,
+		tag_id,
+		ctime)
+		VALUES (#{personId},
+		#{personType},
+		#{tagId},
+		#{ctime}
+		);
+		<!--		<selectKey resultType="java.lang.Integer" order="AFTER"
+                           keyProperty="id">
+                    SELECT LAST_INSERT_ID() AS id
+                </selectKey>-->
+	</insert>
+
+
+
+	<update id="update" parameterType="com.ginkgocap.ywxt.person.model.PersonTagRelation">
+		UPDATE tb_r_person_tag
+		SET person_type = #{personType},
+		tag_id = #{tagId}
+		WHERE person_id = #{personId};
+	</update>
+	<delete id="deleteByPersonId" parameterType="Long">
+		DELETE FROM tb_r_person_tag WHERE person_id = #{personId}
+	</delete>
+
+	<select id="findByPerAndPt" parameterType="Map" resultMap="personTagRelation" >
+		select * from tb_r_person_tag  where person_id = #{personId} and person_type=#{personType}
+	</select>
+
+	<delete id="deleteByPerIdAndperType" parameterType="Map">
+		DELETE from tb_r_person_tag where  person_id=#{personId} and person_type=#{personType}
+	</delete>
+
+    <!-- 根据标签Id获取人脉Id -->
+    <select id="selectPersonBytagId" resultMap="personTagRelation" parameterType="java.util.Map">
+        SELECT
+        r.*
+        FROM
+        tb_r_person_tag r
+        LEFT JOIN tb_person_tags t ON r.tag_id = t.tagId
+        WHERE
+        t.userId = #{userId}
+        AND t.tagId = #{tagId}
+        AND r.person_type = 2 LIMIT #{startRow},#{pageSize}
+    </select>
+
+    <!-- 根据标签Id获取人脉总数 -->
+    <select id="selectPersonCountByTag" resultType="Long" parameterType="java.util.Map">
+        SELECT count(*) as count from (  SELECT
+        r.*
+        FROM
+        tb_r_person_tag r
+        LEFT JOIN tb_person_tags t ON r.tag_id = t.tagId
+        WHERE
+        t.userId = #{userId}
+        AND t.tagId = #{tagId}
+        AND r.person_type = 2 ) num
+    </select>
+
+    <!--根据标签ID删除人脉标签关联数据-->
+    <delete id="deleteByTagId" parameterType="Long">
+        DELETE FROM tb_r_person_tag WHERE tag_id = #{tagId}
+    </delete>
+
+</mapper>
+
+

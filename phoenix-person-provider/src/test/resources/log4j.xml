@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<!-- 全部日志 -->
+	
+	<appender name="person_MQ_Log" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${user.home}/phoenix-person/personMQError.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%d{MMdd HH:mm:ss SSS\} %-5p] [%t] %c{3\} -%m%n" />
+		</layout>
+	</appender>
+	
+	<logger name="com.ginkgocap.ywxt.person.service.impl.PersonServiceImpl"
+		additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="person_MQ_Log" />
+	</logger>
+	
+	<root>
+		<level value="info" />
+		<appender-ref ref="person_MQ_Log" />
+	</root>
+</log4j:configuration> 
+
+

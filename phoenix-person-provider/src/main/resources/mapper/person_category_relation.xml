@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tb_r_person_category">
+
+    <resultMap id="personCategoryRelationResult" type="com.ginkgocap.ywxt.person.model.PersonCategoryRelation">
+        <result property="personId" column="person_id" />
+        <result property="personType" column="person_type" />
+        <result property="categoryId" column="category_id" />
+        <result property="ctime" column="ctime" />
+        <result property="ctype" column="ctype" />
+        <result property="userId" column="user_id" />
+    </resultMap>
+    
+	<insert id="insertPersonCategoryRelation" parameterType="com.ginkgocap.ywxt.person.model.PersonCategoryRelation">
+		insert into tb_r_person_category
+		( person_id, person_type, category_id, ctype, user_id,ctime )
+		VALUES
+		( #{personId}, #{personType}, #{categoryId}, #{ctype}, #{userId},#{ctime} )
+	</insert>
+    
+    <insert id="insertPersonCategoryRelationBatch" parameterType="java.util.Map">
+        insert into tb_r_person_category
+        ( person_id, person_type, category_id, ctype, user_id,ctime )
+        VALUES
+        <foreach collection="list" item="item" separator="," >
+            ( #{item.personId}, #{item.personType}, #{item.categoryId}, #{item.ctype}, #{item.userId},#{item.ctime} )
+        </foreach>
+    </insert>
+
+    <update id="updatePersonCategoryRelation" parameterType="java.util.HashMap">
+        UPDATE `tb_r_person_category`
+        set
+        category_id = #{categoryId}
+        where FIND_IN_SET(category_id,#{categoryIds})
+    </update>
+
+    <select id="selectFavoriteRelation" parameterType="java.util.HashMap" resultMap="personCategoryRelationResult">
+        select trpc.person_id,trpc.person_type,trpc.category_id,trpc.ctime,trpc.ctype,trpc.user_id from tb_r_person_category trpc where trpc.user_id = #{userId} and trpc.person_id = #{personId} and trpc.person_type = 2 and trpc.ctype = 2
+    </select>
+    
+    <delete id="cancelFavoriteRelation" parameterType="com.ginkgocap.ywxt.person.model.PersonCategoryRelation">
+        DELETE from tb_r_person_category where person_id = #{personId} and person_type = 2 and user_id = #{userId} and ctype = 2
+    </delete>
+
+    <delete id="deleteByPerIdAndperType" parameterType="Map">
+        DELETE from tb_r_person_category where  person_id=#{personId} and person_type=#{personType}
+    </delete>
+    <delete id="deleteByPerIdAndPerTypeAndUid" parameterType="Map">
+        DELETE from tb_r_person_category where  person_id=#{personId} and person_type=#{personType} and user_id=#{userId}
+    </delete>
+
+
+    <delete id="deleteByPerIdAndperTyAndCtyAndUid" parameterType="Map">
+        DELETE from tb_r_person_category where  person_id=#{personId} and person_type=#{personType} AND ctype=#{ctype} and user_id=#{userId}
+    </delete>
+
+    <select id="selectByUidAndPerAndPerTy" parameterType="java.util.HashMap" resultMap="personCategoryRelationResult">
+        select * from tb_r_person_category where user_id = #{userId} and person_id = #{personId} and person_type = #{personType}
+    </select>
+    <select id="selectUserCount" parameterType="Map" resultType="java.util.HashMap">
+        SELECT count( distinct person_id) as count  FROM tb_r_person_category  where user_id=#{userId} and person_type = #{personType} 
+    </select>
+    <select id="selectUser" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT    distinct person_id as person_id  FROM tb_r_person_category  where person_type = #{personType} and user_id=#{userId}
+    </select>
+    <select id="selectPersonUser" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT    distinct person_id as person_id  FROM tb_r_person_category  where ctype=1 and person_type = 2 and user_id=#{userId}
+    </select>
+    <select id="selectCollectUser" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT    distinct person_id as person_id  FROM tb_r_person_category  where ctype =2 and person_type =2 and user_id=#{userId}
+    </select>
+    <select id="selectAllPerson" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT    distinct person_id as person_id  FROM tb_r_person_category  where (ctype=1 OR ctype=2) and person_type =2 and user_id=#{userId}
+    </select>
+
+
+    <!-- 只用于数据移植 -->
+    <select id="selectAll" parameterType="java.util.HashMap" resultType="Long">
+        SELECT  distinct person_id FROM tb_r_person_category
+    </select>
+    
+    <select id="selectCountByPersonIdForUserId" parameterType="java.util.HashMap" resultType="java.lang.Long">
+        select count(1) from tb_r_person_category trpc where trpc.user_id = #{userId} and trpc.person_id = #{personId} and trpc.person_type = 2 and trpc.ctype = 2
+    </select>
+    
+    <select id="selectPersonCount" parameterType="Map" resultType="java.util.HashMap">
+     	select count(person_id) as count  FROM tb_r_person_category  where 1=1
+    	<if test="categoryId!=null">
+        	and category_id = #{categoryId}
+        </if>
+        <if test="userId!=null">
+          	and user_id=#{userId} and category_id != -1
+        </if>
+    </select>
+</mapper>  
