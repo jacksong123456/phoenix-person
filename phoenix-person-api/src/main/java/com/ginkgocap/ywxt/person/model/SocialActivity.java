@@ -12,6 +12,7 @@ public class SocialActivity implements Serializable {
 	 * 介绍人
 	 */
 	private String introducer;
+	private String abc;
 	/**
 	 * 老乡
 	 */
